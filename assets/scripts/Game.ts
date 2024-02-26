@@ -1,5 +1,7 @@
 import {
   _decorator,
+  AudioClip,
+  AudioSource,
   Component,
   EventTouch,
   instantiate,
@@ -53,6 +55,11 @@ export class Game extends Component {
 
   @property(LabelComponent)
   txtOverScore: LabelComponent = null!;
+
+  @property(AudioClip)
+  soundMove: AudioClip = null!;
+  @property(AudioClip)
+  soundGetScore: AudioClip = null!;
 
   private userData: any = null;
   // 间隔
@@ -267,6 +274,14 @@ export class Game extends Component {
     }
 
     if (canMove) {
+      let ad: AudioSource = new AudioSource();
+
+      if (isGetScore) {
+        ad.playOneShot(this.soundGetScore);
+      } else {
+        ad.playOneShot(this.soundMove);
+      }
+
       this.cleanAllItem();
 
       for (let i = 0; i < this.array.length; i++) {

@@ -149,6 +149,7 @@ export class Game extends Component {
                 this.array[i][j + 1 + k] = this.array[i][j + k];
                 this.array[i][j + k] = 0;
                 canMove = true;
+                break;
               } else if (
                 j + 1 + k < this.array.length &&
                 this.array[i][j + 1 + k] === this.array[i][j + k] &&
@@ -161,6 +162,7 @@ export class Game extends Component {
                 canMove = true;
                 isGetScore = true;
                 this.updateScore(this.array[i][j + 1 + k]);
+                break;
               }
             }
           }
@@ -179,6 +181,7 @@ export class Game extends Component {
                 this.array[i][j - 1 - k] = this.array[i][j - k];
                 this.array[i][j - k] = 0;
                 canMove = true;
+                break;
               } else if (
                 j - 1 - k >= 0 &&
                 this.array[i][j - 1 - k] === this.array[i][j - k] &&
@@ -189,6 +192,7 @@ export class Game extends Component {
                 canMove = true;
                 isGetScore = true;
                 this.updateScore(this.array[i][j - 1 - k]);
+                break;
               }
             }
           }
@@ -206,6 +210,7 @@ export class Game extends Component {
                 this.array[i + 1 + k][j] = this.array[i + k][j];
                 this.array[i + k][j] = 0;
                 canMove = true;
+                break;
               } else if (
                 i + 1 + k < this.array.length &&
                 this.array[i + 1 + k][j] === this.array[i + k][j] &&
@@ -216,6 +221,7 @@ export class Game extends Component {
                 canMove = true;
                 isGetScore = true;
                 this.updateScore(this.array[i + 1 + k][j]);
+                break;
               }
             }
           }
@@ -233,6 +239,7 @@ export class Game extends Component {
                 this.array[i - 1 - k][j] = this.array[i - k][j];
                 this.array[i - k][j] = 0;
                 canMove = true;
+                break;
               }
 
               if (
@@ -245,6 +252,7 @@ export class Game extends Component {
                 canMove = true;
                 isGetScore = true;
                 this.updateScore(this.array[i - 1 - k][j]);
+                break;
               }
             }
           }
@@ -399,6 +407,7 @@ export class Game extends Component {
       }
 
       this.createItem(arr_0[i_random], this.array[ii][jj], true);
+      this.onCheckOver();
     }
   }
 
@@ -479,5 +488,63 @@ export class Game extends Component {
     this.initPanel();
     this.startPanel.active = true;
     this.gameType = 0;
+  }
+
+  // 检测是否游戏结束
+  private onCheckOver() {
+    let isOver = true;
+
+    for (let i = 0; i < this.array.length; i++) {
+      for (let j = 0; j < this.array[i].length; j++) {
+        if (this.array[i][j] === 0) {
+          isOver = false;
+        }
+      }
+    }
+
+    // 删除降低结束难度
+    // for (let i = 0; i < this.array.length; i++) {
+    //   for (let j = 0; j < this.array[i].length; j++) {
+    //     if (
+    //       j + 1 < this.array.length &&
+    //       this.array[i][j] === this.array[i][j + 1]
+    //     ) {
+    //       isOver = false;
+    //     } else if (
+    //       i + 1 < this.array.length &&
+    //       this.array[i][j] === this.array[i + 1][j]
+    //     ) {
+    //       isOver = false;
+    //     }
+    //   }
+    // }
+
+    if (isOver) {
+      this.gameType = 2;
+      this.overPanel.active = true;
+
+      let gameOverScore = this.userData.score;
+      this.userData.score = 0;
+      this.userData.array = [];
+      this.userData.arr_history = [];
+      this.userData.backNum = 3;
+
+      this.saveUserInfo();
+    } else {
+      this.userData.arr_history.push(this.array);
+      this.userData.array = this.array;
+      let len = this.userData.arr_history.length - 1;
+      if (len > 10) {
+        this.userData.arr_history.shift();
+      }
+
+      if (len > this.userData.backNum) {
+        len = this.userData.backNum;
+      }
+
+      this.txtBack.string = `撤回(${len})`;
+
+      this.saveUserInfo()
+    }
   }
 }

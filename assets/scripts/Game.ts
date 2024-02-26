@@ -129,7 +129,91 @@ export class Game extends Component {
     }
   }
 
-  private moveItem(type: string) {}
+  private moveItem(type: string) {
+    // 是否能移动
+    let canMove: boolean = false;
+    // 是否能得分
+    let isGetScore: boolean = false;
+
+    switch (type) {
+      case "right":
+        for (let j = 0; j < this.array.length; j++) {
+          for (let i = 0; i < this.array.length; i++) {
+            for (let k = 0; k < this.array.length; k++) {
+              // 能移动
+              if (
+                j + 1 + k < this.array.length &&
+                this.array[i][j + 1 + k] === 0 &&
+                this.array[i][j + k] > 0
+              ) {
+                this.array[i][j + 1 + k] = this.array[i][j + k];
+                this.array[i][j + k] = 0;
+                canMove = true;
+              } else if (
+                j + 1 + k < this.array.length &&
+                this.array[i][j + 1 + k] === this.array[i][j + k] &&
+                this.array[i][j + k] > 0
+              ) {
+                // 两个值相等且大于 0
+                this.array[i][j + 1 + k] = this.array[i][j + 1 + k] * 2;
+                // 将移动的格子清零
+                this.array[i][j + k] = 0;
+                canMove = true;
+                isGetScore = true;
+                this.updateScore(this.array[i][j + 1 + k]);
+              }
+            }
+          }
+        }
+        break;
+      case "left":
+        break;
+
+      default:
+        break;
+    }
+
+    if (canMove) {
+      this.cleanAllItem();
+
+      for (let i = 0; i < this.array.length; i++) {
+        for (let j = 0; j < this.array[i].length; j++) {
+          // 有格子
+          if (this.array[i][j] > 0) {
+            let pos = v2(i, j);
+            this.createItem(pos, this.array[i][j]);
+          }
+        }
+      }
+
+      this.addRandomArray();
+    }
+  }
+
+  // 清空格子
+  private cleanAllItem() {
+    // 拿到父容器的所有对象
+    let children = this.ndParent.children;
+    for (let i = children.length - 1; i >= 0; i--) {
+      let tile = children[i].getComponent(Tile);
+      if (tile) {
+        this.ndParent.removeChild(children[i]);
+      }
+    }
+  }
+
+  // 更新分数
+  private updateScore(score: number) {
+    this.userData.score += score;
+    if (this.userData.score > this.userData.bestScore) {
+      this.userData.bestScore = this.userData.score;
+    }
+
+    this.txtScore.string = this.userData.score.toString();
+    this.txtBestScore.string = this.userData.bestScore.toString();
+
+    this.saveUserInfo();
+  }
 
   update(deltaTime: number) {}
 

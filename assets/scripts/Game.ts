@@ -51,6 +51,9 @@ export class Game extends Component {
   @property(Prefab)
   itemBg: Prefab = null!;
 
+  @property(LabelComponent)
+  txtOverScore: LabelComponent = null!;
+
   private userData: any = null;
   // 间隔
   private gap: number = 0;
@@ -292,6 +295,16 @@ export class Game extends Component {
     }
   }
 
+  private cleanAllItemBg() {
+    let children = this.ndParent.children;
+    for (let i = children.length - 1; i >= 0; i--) {
+      let tile = children[i].getComponent(Tile);
+      if (!tile) {
+        this.ndParent.removeChild(children[i]);
+      }
+    }
+  }
+
   // 更新分数
   private updateScore(score: number) {
     this.userData.score += score;
@@ -470,24 +483,83 @@ export class Game extends Component {
     this.init();
   }
 
-  private onBtnReplayClick() {}
+  private onBtnReplayClick() {
+    this.gameType = 1;
+    this.userData.score = 0;
+    this.userData.arr_history = [];
+    this.txtBack.string = `撤回(0)`;
+    this.userData.backNum = 3;
+    this.txtScore.string = "0";
+    this.cleanAllItem();
+    this.initArray(this.userData.lv);
+    this.addRandomArray();
+  }
 
-  private onBtnBackClick() {}
+  private onBtnBackClick() {
+    let len = this.userData.arr_history.length;
+
+    if (len >= 2 && this.userData.backNum > 0) {
+      this.userData.arr_history.pop();
+      let str_arr = this.userData.arr_history[len - 2];
+
+      let arr = str_arr.split(",");
+      this.cleanAllItem();
+
+      let k_num = -1;
+      for (let i = 0; i < this.array.length; i++) {
+        for (let j = 0; j < this.array[i].length; j++) {
+          k_num++;
+          this.array[i][j] = parseInt(arr[k_num]);
+          if (this.array[i][j] > 0) {
+            let pos = v2(i, j);
+            this.createItem(pos, this.array[i][j], true);
+          }
+        }
+      }
+
+      this.userData.backNum--;
+
+      let len1 = this.userData.arr_history.length - 1;
+      if (len1 <= 0) {
+        len1 = 0;
+      }
+
+      if (len1 > this.userData.backNum) {
+        len1 = this.userData.backNum;
+      }
+
+      this.txtBack.string = `撤回(${len1})`;
+      this.saveUserInfo();
+    }
+  }
 
   private onBtnHomeClick() {
     this.initPanel();
     this.startPanel.active = true;
     this.gameType = 0;
+    this.cleanAllItem();
+    this.cleanAllItemBg();
   }
 
   private onOverBtnReplayClick() {
     this.overPanel.active = false;
+    this.gameType = 1;
+    this.userData.score = 0;
+    this.userData.arr_history = [];
+    this.txtBack.string = `撤回(0)`;
+    this.userData.backNum = 3;
+    this.txtScore.string = "0";
+    this.cleanAllItem();
+    this.initArray(this.userData.lv);
+    this.addRandomArray();
   }
 
   private onOverBtnHomeClick() {
     this.initPanel();
     this.startPanel.active = true;
     this.gameType = 0;
+    this.cleanAllItem();
+    this.cleanAllItemBg();
   }
 
   // 检测是否游戏结束
@@ -524,6 +596,7 @@ export class Game extends Component {
       this.overPanel.active = true;
 
       let gameOverScore = this.userData.score;
+      this.txtOverScore.string = `获得${gameOverScore}分`;
       this.userData.score = 0;
       this.userData.array = [];
       this.userData.arr_history = [];
@@ -531,7 +604,7 @@ export class Game extends Component {
 
       this.saveUserInfo();
     } else {
-      this.userData.arr_history.push(this.array);
+      this.userData.arr_history.push(this.array.join());
       this.userData.array = this.array;
       let len = this.userData.arr_history.length - 1;
       if (len > 10) {
@@ -544,7 +617,7 @@ export class Game extends Component {
 
       this.txtBack.string = `撤回(${len})`;
 
-      this.saveUserInfo()
+      this.saveUserInfo();
     }
   }
 }

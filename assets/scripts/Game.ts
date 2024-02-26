@@ -373,12 +373,34 @@ export class Game extends Component {
     this.txtLv.string = `${level}x${level}`;
     this.txtScore.string = `${this.userData.score}`;
     this.txtBestScore.string = `${this.userData.bestScore}`;
-    this.txtBack.string = `撤回(${this.userData.backNum})`;
 
-    // 初始化数组
-    this.initArray(level);
-    // 创建随机数组
-    this.addRandomArray();
+    let len = this.userData.arr_history.length - 1;
+    if (len <= 0) {
+      len = 0;
+    }
+    if (len > this.userData.backNum) {
+      len = this.userData.backNum;
+    }
+
+    this.txtBack.string = `撤回(${len})`;
+
+    // 无保存记录
+    if (this.userData.array.length === 0) {
+      // 初始化数组
+      this.initArray(level);
+      // 创建随机数组
+      this.addRandomArray();
+    } else {
+      this.array = this.userData.array;
+      for (let i = 0; i < this.array.length; i++) {
+        for (let j = 0; j < this.array[i].length; j++) {
+          if (this.array[i][j] > 0) {
+            let pos = v2(i, j);
+            this.createItem(pos, this.array[i][j]);
+          }
+        }
+      }
+    }
   }
 
   // 初始化数组

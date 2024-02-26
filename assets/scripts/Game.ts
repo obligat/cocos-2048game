@@ -167,6 +167,88 @@ export class Game extends Component {
         }
         break;
       case "left":
+        for (let j = 1; j < this.array.length; j++) {
+          for (let i = 0; i < this.array[j].length; i++) {
+            for (let k = 0; k < this.array.length; k++) {
+              // 从上往下减
+              if (
+                j - 1 - k >= 0 &&
+                this.array[i][j - 1 - k] === 0 &&
+                this.array[i][j - k] > 0
+              ) {
+                this.array[i][j - 1 - k] = this.array[i][j - k];
+                this.array[i][j - k] = 0;
+                canMove = true;
+              } else if (
+                j - 1 - k >= 0 &&
+                this.array[i][j - 1 - k] === this.array[i][j - k] &&
+                this.array[i][j - k] > 0
+              ) {
+                this.array[i][j - 1 - k] = this.array[i][j - 1 - k] * 2;
+                this.array[i][j - k] = 0;
+                canMove = true;
+                isGetScore = true;
+                this.updateScore(this.array[i][j - 1 - k]);
+              }
+            }
+          }
+        }
+        break;
+      case "up":
+        for (let i = this.array.length - 2; i >= 0; i--) {
+          for (let j = 0; j < this.array[i].length; j++) {
+            for (let k = 0; k < this.array.length; k++) {
+              if (
+                i + 1 + k < this.array.length &&
+                this.array[i + 1 + k][j] === 0 &&
+                this.array[i + k][j] > 0
+              ) {
+                this.array[i + 1 + k][j] = this.array[i + k][j];
+                this.array[i + k][j] = 0;
+                canMove = true;
+              } else if (
+                i + 1 + k < this.array.length &&
+                this.array[i + 1 + k][j] === this.array[i + k][j] &&
+                this.array[i + k][j] > 0
+              ) {
+                this.array[i + 1 + k][j] = this.array[i + 1 + k][j] * 2;
+                this.array[i + k][j] = 0;
+                canMove = true;
+                isGetScore = true;
+                this.updateScore(this.array[i + 1 + k][j]);
+              }
+            }
+          }
+        }
+        break;
+      case "down":
+        for (let i = 1; i < this.array.length; i++) {
+          for (let j = 0; j < this.array[i].length; j++) {
+            for (let k = 0; k < this.array.length; k++) {
+              if (
+                i - 1 - k >= 0 &&
+                this.array[i - 1 - k][j] === 0 &&
+                this.array[i - k][j] > 0
+              ) {
+                this.array[i - 1 - k][j] = this.array[i - k][j];
+                this.array[i - k][j] = 0;
+                canMove = true;
+              }
+
+              if (
+                i - 1 - k >= 0 &&
+                this.array[i - 1 - k][j] === this.array[i - k][j] &&
+                this.array[i - k][j] > 0
+              ) {
+                this.array[i - 1 - k][j] = this.array[i - 1 - k][j] * 2;
+                this.array[i - k][j] = 0;
+                canMove = true;
+                isGetScore = true;
+                this.updateScore(this.array[i - 1 - k][j]);
+              }
+            }
+          }
+        }
         break;
 
       default:

@@ -1,9 +1,11 @@
 import {
   _decorator,
   Component,
+  EventTouch,
   instantiate,
   LabelComponent,
   Node,
+  NodeEventType,
   Prefab,
   sys,
   tween,
@@ -59,10 +61,75 @@ export class Game extends Component {
   // 初始化数组
   private array = [];
 
+  private posStart;
+  private posEnd;
+
+  private gameType: number = 0;
+
   start() {
     this.initPanel();
     this.startPanel.active = true;
+    this.addTouch();
   }
+
+  private addTouch() {
+    this.node.on(NodeEventType.TOUCH_START, this.onTouchStart, this);
+    this.node.on(NodeEventType.TOUCH_MOVE, this.onTouchMove, this);
+    this.node.on(NodeEventType.TOUCH_END, this.onTouchEnd, this);
+    this.node.on(NodeEventType.TOUCH_CANCEL, this.onTouchCancel, this);
+  }
+
+  private onTouchStart(event: EventTouch) {
+    if (this.gameType !== 1) {
+      return;
+    }
+    this.posStart = event.getLocation();
+  }
+
+  private onTouchMove(event: EventTouch) {
+    if (this.gameType !== 1) {
+      return;
+    }
+  }
+
+  private onTouchEnd(event: EventTouch) {
+    if (this.gameType !== 1) {
+      return;
+    }
+    this.posEnd = event.getLocation();
+    let xx = this.posEnd.x - this.posStart.x;
+    let yy = this.posEnd.y - this.posStart.y;
+
+    if (Math.abs(xx) < 10 && Math.abs(yy) < 10) {
+      return;
+    }
+
+    if (Math.abs(xx) > Math.abs(yy)) {
+      if (xx > 0) {
+        this.moveItem("right");
+        console.log("move to right");
+      } else {
+        this.moveItem("left");
+        console.log("move to left");
+      }
+    } else {
+      if (yy < 0) {
+        this.moveItem("down");
+        console.log("move to down");
+      } else {
+        this.moveItem("up");
+        console.log("move to up");
+      }
+    }
+  }
+
+  private onTouchCancel(event: EventTouch) {
+    if (this.gameType !== 1) {
+      return;
+    }
+  }
+
+  private moveItem(type: string) {}
 
   update(deltaTime: number) {}
 
@@ -103,6 +170,7 @@ export class Game extends Component {
   }
 
   private updateView() {
+    this.gameType = 1;
     let level = this.userData.level;
 
     this.gap = 5;
@@ -193,7 +261,9 @@ export class Game extends Component {
 
     if (isAction) {
       item.scale = v3(0, 0, 0);
-      tween(item).to(0.15, { scale: v3(1, 1, 1) }, { easing: "sineInOut" }).start();
+      tween(item)
+        .to(0.15, { scale: v3(1, 1, 1) }, { easing: "sineInOut" })
+        .start();
     }
   }
 
@@ -232,6 +302,7 @@ export class Game extends Component {
   private onBtnHomeClick() {
     this.initPanel();
     this.startPanel.active = true;
+    this.gameType = 0;
   }
 
   private onOverBtnReplayClick() {
@@ -241,5 +312,6 @@ export class Game extends Component {
   private onOverBtnHomeClick() {
     this.initPanel();
     this.startPanel.active = true;
+    this.gameType = 0;
   }
 }

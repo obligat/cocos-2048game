@@ -4678,6 +4678,20 @@
     "txtBack": {
       "__id__": 60
     },
+    "ndParent": {
+      "__id__": 73
+    },
+    "ndParentTransform": {
+      "__id__": 74
+    },
+    "item": {
+      "__uuid__": "73687ebe-c202-4029-81cf-c57fe440b44f",
+      "__expectedType__": "cc.Prefab"
+    },
+    "itemBg": {
+      "__uuid__": "425e9dce-c6c1-4e29-be95-5eefda334c71",
+      "__expectedType__": "cc.Prefab"
+    },
     "_id": "33ygWCIaRP+7Jipkp2nq2u"
   },
   {
